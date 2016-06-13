@@ -1,0 +1,25 @@
+# Leiningen
+pom.xml
+pom.xml.asc
+*jar
+/lib/
+/classes/
+/target/
+/checkouts/
+.lein-deps-sum
+.lein-env
+.lein-repl-history
+.lein-plugins/
+.lein-failures
+.nrepl-port
+
+#Emacs
+# -*- mode: gitignore; -*-
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
