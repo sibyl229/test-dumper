@@ -17,6 +17,9 @@
        [?attr :pace/identifies-class ?class]
        [?attr :db/ident ?class-ident]] (d/db con) "Gene")
 
+(defn is-wb-id [id]
+  (re-matches #"WBGene.*" id))
+
 (defn dump-class
   "Dump object of class `class` from `db`."
   [db class & {:keys [query delete tag follow format limit]}]
@@ -25,15 +28,27 @@
                         :where
                         [?attr :pace/identifies-class ?class]
                         [?attr :db/ident ?class-ident]]
-                   db class)]
-    (doseq [id (->> (d/q '[:find [?id ...]
-                           :in $ ?ident
-                           :where [?id ?ident _]]
-                         db ident)
-                    (sort)
-                    (take (or limit Integer/MAX_VALUE)))]
-      (pprint id)
-;;      (dump-object (ace-object db id))
-	)
+                      db class)]
+    (->> (d/q '[:find [?gid ...]
+                :in $ ?ident
+                :where [?id ?ident ?gid]]
+              db ident)
+         (sort)
+         (take (or limit Integer/MAX_VALUE)))
+;;     (doseq []
+;;       ( id)
+;; ;;      (dump-object (ace-object db id))
+;; 	)
 ;;    (throw-exc "Couldn't find '" class "'")
-      ))
+    ))
+
+(defn writelines [file-path lines]
+  (with-open [wtr (clojure.java.io/writer file-path)]
+    (doseq [line lines] (.write wtr (str line "\n")))))
+
+(->> (dump-class (d/db con) "Gene")
+     (filter is-wb-id)
+     (writelines "output/gene-ids.txt"))
+
+;;(use 'starter.core :reload)
+;;(dump-class (d/db con) "Gene")
